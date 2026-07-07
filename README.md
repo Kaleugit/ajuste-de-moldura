@@ -61,4 +61,14 @@ Abra [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Próximas implementações
+
+### Otimização de memória
+Atualmente cada foto mantém o `HTMLImageElement` decodificado em memória (~48 MB por imagem) durante toda a sessão. A otimização prevista é descartar esse objeto após o processamento inicial e recriar a imagem sob demanda a partir da data URL quando o usuário trocar cor ou orientação. Isso reduz o custo por foto de ~60 MB para ~10 MB, permitindo lotes maiores sem backend.
+
+### Baixar todas as fotos de uma vez
+Quando o lote tiver mais de uma foto, um botão "Baixar todas" gerará um arquivo `.zip` com todas as imagens processadas via [JSZip](https://stuk.github.io/jszip/), evitando a necessidade de baixar uma por uma.
+
+---
+
 developed by [kaleu.dev](https://kaleu.dev) 2026 ® — All rights reserved.
