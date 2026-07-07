@@ -50,6 +50,10 @@ const T = {
     toastReadError: (name: string) => `Não consegui ler "${name}".`,
     toastInvalid: (name: string) => `"${name}" não é uma imagem válida.`,
     toastProcessError: 'Erro ao processar a imagem.',
+    proCta: 'Quer fazer um lote maior? Veja o plano PRO',
+    proModalTitle: 'Em breve 🚀',
+    proModalBody: 'Esta ferramenta ainda está em fase de testes. O plano PRO chegará em breve — fique de olho!',
+    proModalClose: 'Entendido',
   },
   en: {
     title: 'Frame adjuster',
@@ -75,6 +79,10 @@ const T = {
     toastReadError: (name: string) => `Could not read "${name}".`,
     toastInvalid: (name: string) => `"${name}" is not a valid image.`,
     toastProcessError: 'Error processing the image.',
+    proCta: 'Want a larger batch? See the PRO plan',
+    proModalTitle: 'Coming soon 🚀',
+    proModalBody: 'This tool is still in testing phase. The PRO plan is on its way — stay tuned!',
+    proModalClose: 'Got it',
   },
 }
 
@@ -122,6 +130,7 @@ export default function FrameConverter() {
   const [isDragging, setIsDragging] = useState(false)
   const [lang, setLang] = useState<Lang>('pt')
   const [langMenuOpen, setLangMenuOpen] = useState(false)
+  const [proModalOpen, setProModalOpen] = useState(false)
   const langMenuRef = useRef<HTMLDivElement>(null)
 
   const t = T[lang]
@@ -260,32 +269,34 @@ export default function FrameConverter() {
   )
 
   return (
-    <div className="bg-[#161d2f] text-white font-sans min-h-screen relative overflow-hidden">
-      {/* Blobs de fundo */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-[#1e3a5f]/30 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#0f2240]/40 blur-3xl" />
-      </div>
+    <div className="text-white font-sans min-h-screen relative">
+
+      {/* Fundo fixo — imagem + overlay escuro */}
+      <div
+        className="fixed inset-0 -z-20 bg-cover bg-center"
+        style={{ backgroundImage: "url('/milad-fakurian-PGdW_bHDbpI-unsplash.jpg')" }}
+      />
+      <div className="fixed inset-0 -z-10 bg-[#0d0820]/72" />
 
       {/* Toggle de idioma */}
       <div className="fixed top-5 right-5 z-50" ref={langMenuRef}>
         <button
           onClick={() => setLangMenuOpen(o => !o)}
-          className="flex items-center bg-[#1c2540] border border-white/[0.12] rounded-md px-2 py-1 text-[10px] font-semibold tracking-widest uppercase transition-colors duration-150 hover:border-white/25"
+          className="flex items-center backdrop-blur-md bg-white/[0.10] border border-white/[0.22] rounded-md px-2.5 py-1 text-[10px] font-semibold tracking-widest uppercase transition-all duration-150 hover:bg-white/[0.17]"
         >
           {lang === 'pt' ? 'EN' : 'PT'}
         </button>
         {langMenuOpen && (
-          <div className="absolute right-0 mt-1.5 bg-[#1c2540] border border-white/[0.12] rounded-lg overflow-hidden shadow-xl">
+          <div className="absolute right-0 mt-1.5 backdrop-blur-2xl bg-white/[0.10] border border-white/[0.18] rounded-xl overflow-hidden shadow-2xl">
             {(['pt', 'en'] as Lang[]).map(l => (
               <button
                 key={l}
                 onClick={() => { setLang(l); setLangMenuOpen(false) }}
                 className={[
-                  'block w-full px-4 py-2 text-[10px] font-semibold tracking-widest uppercase text-left transition-colors duration-150',
+                  'block w-full px-5 py-2.5 text-[10px] font-semibold tracking-widest uppercase text-left transition-colors duration-150',
                   lang === l
-                    ? 'text-white bg-white/[0.08]'
-                    : 'text-[#7b8db0] hover:text-white hover:bg-white/[0.04]',
+                    ? 'text-white bg-white/[0.14]'
+                    : 'text-white/50 hover:text-white hover:bg-white/[0.08]',
                 ].join(' ')}
               >
                 {l === 'pt' ? 'Português' : 'English'}
@@ -295,34 +306,37 @@ export default function FrameConverter() {
         )}
       </div>
 
-      <div className="relative max-w-[960px] mx-auto px-4 pt-10 pb-28 sm:px-6 sm:pt-14 sm:pb-24">
+      <div className="relative max-w-[960px] mx-auto px-4 pt-12 pb-28 sm:px-6 sm:pt-16 sm:pb-24">
 
         {/* Header */}
-        <header className="mb-8 sm:mb-12 text-center">
-          <h1 className="text-[clamp(28px,5vw,52px)] font-bold tracking-tight leading-none mb-3 sm:mb-4">
+        <header className="mb-10 sm:mb-14 text-center">
+          <h1
+            className="text-[clamp(36px,6vw,64px)] italic font-bold leading-tight mb-4"
+            style={{ fontFamily: 'var(--font-playfair)' }}
+          >
             {t.title}
           </h1>
-          <p className="text-[#7b8db0] text-[14px] sm:text-[15px] max-w-[58ch] leading-relaxed mx-auto">
+          <p className="text-white/48 text-[14px] sm:text-[15px] max-w-[52ch] leading-relaxed mx-auto">
             {t.subtitle}
           </p>
         </header>
 
         {/* Diagrama ilustrativo */}
-        <div className="max-w-[560px] mx-auto mb-4 p-3 sm:p-6 rounded-2xl bg-[#1c2540] border border-white/[0.06] flex justify-center items-center gap-3 sm:gap-8">
+        <div className="max-w-[560px] mx-auto mb-4 p-3 sm:p-6 rounded-2xl backdrop-blur-xl bg-white/[0.07] border border-white/[0.14] flex justify-center items-center gap-3 sm:gap-8">
           <div className="text-center">
             <div className="max-w-[120px] sm:max-w-none">
-              <canvas ref={demoBeforeRef} width={192} height={108} className="rounded-lg w-full h-auto" />
+              <canvas ref={demoBeforeRef} width={192} height={108} className="rounded-xl w-full h-auto" />
             </div>
-            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#7b8db0]">
+            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-violet-300/60">
               {t.demoOriginal}
             </div>
           </div>
-          <div className="text-lg sm:text-2xl text-[#7b8db0]">→</div>
+          <div className="text-lg sm:text-2xl text-white/30">→</div>
           <div className="text-center">
             <div className="max-w-[102px] sm:max-w-none">
-              <canvas ref={demoAfterRef} width={162} height={108} className="rounded-lg w-full h-auto" />
+              <canvas ref={demoAfterRef} width={162} height={108} className="rounded-xl w-full h-auto" />
             </div>
-            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#7b8db0]">
+            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-violet-300/60">
               {t.demoResult}
             </div>
           </div>
@@ -331,10 +345,10 @@ export default function FrameConverter() {
         {/* Dropzone */}
         <div
           className={[
-            'max-w-[560px] mx-auto mb-8 rounded-xl border border-dashed py-7 sm:py-10 px-6 text-center cursor-pointer transition-all duration-200',
+            'max-w-[560px] mx-auto mb-8 rounded-2xl border border-dashed py-8 sm:py-12 px-6 text-center cursor-pointer transition-all duration-200 backdrop-blur-md',
             isDragging
-              ? 'border-white/40 bg-white/[0.04]'
-              : 'border-white/[0.18] hover:border-white/30 hover:bg-white/[0.02]',
+              ? 'border-violet-400/60 bg-violet-500/[0.08]'
+              : 'border-white/[0.22] bg-white/[0.04] hover:border-white/40 hover:bg-white/[0.07]',
           ].join(' ')}
           onClick={() => fileInputRef.current?.click()}
           onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
@@ -358,13 +372,13 @@ export default function FrameConverter() {
             <UploadIcon />
           </div>
           <p className="text-[16px] font-medium mb-1">{t.dropTitle}</p>
-          <p className="text-[13px] text-[#7b8db0]">{t.dropSub}</p>
+          <p className="text-[13px] text-white/45">{t.dropSub}</p>
         </div>
 
         {/* Controles */}
         <div className="flex items-center justify-between gap-4 mt-6 mb-2 flex-wrap">
           <div className="flex gap-3 items-center">
-            <span className="text-[11px] font-semibold tracking-widest uppercase text-[#7b8db0]">
+            <span className="text-[11px] font-semibold tracking-widest uppercase text-violet-300/70">
               {t.frameLabel}
             </span>
             {SWATCHES.map(sw => (
@@ -374,17 +388,28 @@ export default function FrameConverter() {
                 onClick={() => setFrameColor(sw.color)}
                 style={{ background: sw.color }}
                 className={[
-                  'w-7 h-7 rounded-full cursor-pointer transition-all duration-150',
+                  'w-7 h-7 rounded-full cursor-pointer transition-all duration-200',
                   frameColor === sw.color
-                    ? 'ring-2 ring-offset-2 ring-offset-[#161d2f] ring-white/70'
-                    : 'ring-1 ring-white/20',
+                    ? 'ring-2 ring-offset-2 ring-offset-[#0d0820] ring-violet-400/80'
+                    : 'ring-1 ring-white/25 hover:ring-white/50',
                 ].join(' ')}
               />
             ))}
           </div>
-          <div className="text-[13px] text-[#7b8db0]">
+          <div className="text-[13px] text-white/40">
             {items.length} / {MAX_FILES} {t.photos}
           </div>
+        </div>
+
+        {/* CTA PRO */}
+        <div className="flex justify-center mt-4 mb-2">
+          <button
+            onClick={() => setProModalOpen(true)}
+            className="flex items-center gap-2 backdrop-blur-md bg-white/[0.06] border border-violet-400/30 hover:border-violet-400/60 hover:bg-violet-500/[0.08] text-violet-300/80 hover:text-violet-200 text-[12px] font-medium px-4 py-2 rounded-full transition-all duration-200"
+          >
+            <span className="text-[10px] bg-gradient-to-r from-violet-400 to-indigo-300 bg-clip-text text-transparent font-bold tracking-widest uppercase">PRO</span>
+            {t.proCta}
+          </button>
         </div>
 
         {/* Grid de resultados */}
@@ -396,33 +421,33 @@ export default function FrameConverter() {
             {items.map(item => (
               <div
                 key={item.id}
-                className="rounded-xl overflow-hidden bg-[#1c2540] border border-white/[0.06] flex flex-col"
+                className="rounded-2xl overflow-hidden backdrop-blur-xl bg-white/[0.07] border border-white/[0.14] flex flex-col"
               >
                 <div
                   className="relative"
                   style={{
                     background:
-                      'repeating-conic-gradient(#252e47 0 90deg, #1c2540 0 180deg) 0 0/16px 16px',
+                      'repeating-conic-gradient(rgba(255,255,255,0.04) 0 90deg, transparent 0 180deg) 0 0/16px 16px',
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.resultUrl} alt={item.filename} className="block w-full h-auto" />
                 </div>
                 <div className="p-4 flex flex-col gap-3 flex-1">
-                  <p className="text-[12px] text-[#7b8db0] truncate" title={item.filename}>
+                  <p className="text-[12px] text-white/40 truncate" title={item.filename}>
                     {item.filename}
                   </p>
-                  <div className="flex rounded-lg overflow-hidden border border-white/[0.12]">
+                  <div className="flex rounded-xl overflow-hidden border border-white/[0.15]">
                     {(['horizontal', 'vertical'] as Orientation[]).map((orient, i) => (
                       <button
                         key={orient}
                         onClick={() => handleOrientationChange(item.id, orient)}
                         className={[
                           'flex-1 text-[11px] font-semibold tracking-widest uppercase py-2 cursor-pointer transition-colors duration-150',
-                          i > 0 ? 'border-l border-white/[0.12]' : '',
+                          i > 0 ? 'border-l border-white/[0.15]' : '',
                           item.orientation === orient
-                            ? 'bg-white/[0.12] text-white'
-                            : 'bg-transparent text-[#7b8db0] hover:text-white',
+                            ? 'bg-white/[0.14] text-white'
+                            : 'bg-transparent text-white/40 hover:text-white',
                         ].join(' ')}
                       >
                         {orient === 'horizontal' ? t.horizontal : t.vertical}
@@ -432,7 +457,7 @@ export default function FrameConverter() {
                   <a
                     href={item.resultUrl}
                     download={item.outName}
-                    className="block w-full text-center bg-[#0fcfa0] hover:bg-[#0db58c] text-[#061a12] font-semibold py-2.5 rounded-lg text-[13px] no-underline transition-colors duration-150"
+                    className="block w-full text-center bg-gradient-to-r from-violet-500 to-indigo-400 hover:from-violet-400 hover:to-indigo-300 text-white font-semibold py-2.5 rounded-xl text-[13px] no-underline transition-all duration-200 shadow-lg shadow-violet-900/30"
                   >
                     {t.download}
                   </a>
@@ -444,14 +469,14 @@ export default function FrameConverter() {
 
         {/* Barra de status / timer */}
         {expiresAt !== null && (
-          <div className="flex items-center justify-between mt-8 pt-5 border-t border-white/[0.06] text-[12px] text-[#7b8db0] flex-wrap gap-3">
+          <div className="flex items-center justify-between mt-8 pt-5 border-t border-white/[0.08] text-[12px] text-white/40 flex-wrap gap-3">
             <span>
               {t.timerPrefix}{' '}
-              <span className="text-white font-mono font-medium">{formatTime(timeLeft)}</span>
+              <span className="text-violet-300 font-mono font-medium">{formatTime(timeLeft)}</span>
             </span>
             <button
               onClick={() => expireFnRef.current?.('manual')}
-              className="bg-transparent border border-white/[0.15] text-[#7b8db0] text-[11px] px-3.5 py-1.5 rounded-lg cursor-pointer transition-colors duration-150 hover:border-white/30 hover:text-white"
+              className="bg-transparent border border-white/[0.18] text-white/40 text-[11px] px-3.5 py-1.5 rounded-lg cursor-pointer transition-colors duration-150 hover:border-white/35 hover:text-white"
             >
               {t.clearNow}
             </button>
@@ -461,15 +486,45 @@ export default function FrameConverter() {
       </div>
 
       {/* Footer */}
-      <footer className="relative text-center pb-8">
-        <p className="text-[12px] text-[#7b8db0]/50 tracking-widest">
+      <footer className="relative text-center pb-10">
+        <p className="text-[11px] text-white/25 tracking-widest">
           developed by kaleu.dev 2026 ® — All rights reserved.
         </p>
       </footer>
 
+      {/* Modal PRO */}
+      {proModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          onClick={() => setProModalOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div
+            className="relative max-w-sm w-full backdrop-blur-2xl bg-white/[0.10] border border-white/[0.20] rounded-2xl p-8 shadow-2xl text-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <p
+              className="text-[28px] font-bold italic mb-3"
+              style={{ fontFamily: 'var(--font-playfair)' }}
+            >
+              {t.proModalTitle}
+            </p>
+            <p className="text-white/60 text-[14px] leading-relaxed mb-6">
+              {t.proModalBody}
+            </p>
+            <button
+              onClick={() => setProModalOpen(false)}
+              className="bg-gradient-to-r from-violet-500 to-indigo-400 hover:from-violet-400 hover:to-indigo-300 text-white font-semibold px-8 py-2.5 rounded-xl text-[13px] transition-all duration-200 shadow-lg shadow-violet-900/30"
+            >
+              {t.proModalClose}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1c2540] border border-white/[0.15] px-5 py-3 rounded-xl text-[13px] text-white pointer-events-none shadow-xl whitespace-nowrap">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 backdrop-blur-2xl bg-white/[0.12] border border-white/[0.22] px-5 py-3 rounded-xl text-[13px] text-white pointer-events-none shadow-2xl whitespace-nowrap">
           {toast}
         </div>
       )}
