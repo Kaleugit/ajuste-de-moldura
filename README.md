@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Moldura — Frame Adjuster
 
-## Getting Started
+Converte fotos 16:9 para o formato de impressão 15:10 adicionando bordas (branca ou preta), sem cortar nem distorcer a composição original.
 
-First, run the development server:
+Acesse via browser em qualquer dispositivo — desktop ou celular.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Funcionalidades
+
+- Processa até **5 fotos por lote** simultaneamente
+- Escolha de cor da moldura: **branca/creme** ou **preta**
+- Alternância de orientação por foto: **horizontal** ou **vertical**
+- Preview ao vivo da conversão antes de qualquer upload
+- **Lote apagado automaticamente após 5 minutos** — sem rastro de dados
+- Interface **bilíngue** (PT / EN) com toggle no canto da tela
+
+---
+
+## Arquitetura
+
+Todo o processamento acontece no **navegador do usuário** — nenhuma imagem é enviada a servidor.
+
+```
+browser
+└── Next.js (App Router, React 19)
+    ├── app/page.tsx           — entrada da aplicação
+    ├── components/
+    │   └── FrameConverter.tsx — UI, estado, drag-and-drop, timer de expiração
+    └── lib/
+        └── imageFit.ts        — lógica de canvas: cálculo de fit, rotação, composição
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O fluxo de processamento por imagem é:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. `FileReader` lê o arquivo localmente e cria um `HTMLImageElement`
+2. `imageFit.ts` calcula o canvas 15:10, pinta o fundo com a cor da moldura e desenha a imagem centralizada
+3. `canvas.toDataURL('image/jpeg', 0.92)` gera a URL de download — tudo em memória, sem I/O externo
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Stack
 
-To learn more about Next.js, take a look at the following resources:
+| Camada | Tecnologia |
+|--------|-----------|
+| Framework | Next.js 16, App Router |
+| UI | React 19, Tailwind CSS v4 |
+| Processamento | Canvas API (client-side) |
+| Linguagem | TypeScript |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Rodando localmente
 
-## Deploy on Vercel
+```bash
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Abra [http://localhost:3000](http://localhost:3000).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+developed by [kaleu.dev](https://kaleu.dev) 2026 ® — All rights reserved.
