@@ -121,6 +121,8 @@ export default function FrameConverter() {
   const [toast, setToast] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [lang, setLang] = useState<Lang>('pt')
+  const [langMenuOpen, setLangMenuOpen] = useState(false)
+  const langMenuRef = useRef<HTMLDivElement>(null)
 
   const t = T[lang]
 
@@ -149,6 +151,17 @@ export default function FrameConverter() {
     const id = setTimeout(() => setToast(''), 2800)
     return () => clearTimeout(id)
   }, [toast])
+
+  useEffect(() => {
+    if (!langMenuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [langMenuOpen])
 
   const drawDemo = useCallback((color: string) => {
     const before = demoBeforeRef.current
@@ -255,41 +268,61 @@ export default function FrameConverter() {
       </div>
 
       {/* Toggle de idioma */}
-      <div className="fixed top-5 right-5 z-50">
+      <div className="fixed top-5 right-5 z-50" ref={langMenuRef}>
         <button
-          onClick={() => setLang(l => (l === 'pt' ? 'en' : 'pt'))}
-          className="flex items-center gap-1 bg-[#1c2540] border border-white/[0.12] rounded-lg px-3 py-1.5 text-[11px] font-semibold tracking-widest uppercase transition-colors duration-150 hover:border-white/25"
+          onClick={() => setLangMenuOpen(o => !o)}
+          className="flex items-center bg-[#1c2540] border border-white/[0.12] rounded-md px-2 py-1 text-[10px] font-semibold tracking-widest uppercase transition-colors duration-150 hover:border-white/25"
         >
-          <span className={lang === 'pt' ? 'text-white' : 'text-[#7b8db0]'}>PT</span>
-          <span className="text-[#7b8db0]">/</span>
-          <span className={lang === 'en' ? 'text-white' : 'text-[#7b8db0]'}>EN</span>
+          {lang === 'pt' ? 'EN' : 'PT'}
         </button>
+        {langMenuOpen && (
+          <div className="absolute right-0 mt-1.5 bg-[#1c2540] border border-white/[0.12] rounded-lg overflow-hidden shadow-xl">
+            {(['pt', 'en'] as Lang[]).map(l => (
+              <button
+                key={l}
+                onClick={() => { setLang(l); setLangMenuOpen(false) }}
+                className={[
+                  'block w-full px-4 py-2 text-[10px] font-semibold tracking-widest uppercase text-left transition-colors duration-150',
+                  lang === l
+                    ? 'text-white bg-white/[0.08]'
+                    : 'text-[#7b8db0] hover:text-white hover:bg-white/[0.04]',
+                ].join(' ')}
+              >
+                {l === 'pt' ? 'Português' : 'English'}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="relative max-w-[960px] mx-auto px-6 pt-14 pb-24">
+      <div className="relative max-w-[960px] mx-auto px-4 pt-10 pb-28 sm:px-6 sm:pt-14 sm:pb-24">
 
         {/* Header */}
-        <header className="mb-12 text-center">
-          <h1 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tight leading-none mb-4">
+        <header className="mb-8 sm:mb-12 text-center">
+          <h1 className="text-[clamp(28px,5vw,52px)] font-bold tracking-tight leading-none mb-3 sm:mb-4">
             {t.title}
           </h1>
-          <p className="text-[#7b8db0] text-[15px] max-w-[58ch] leading-relaxed mx-auto">
+          <p className="text-[#7b8db0] text-[14px] sm:text-[15px] max-w-[58ch] leading-relaxed mx-auto">
             {t.subtitle}
           </p>
         </header>
 
         {/* Diagrama ilustrativo */}
-        <div className="max-w-[560px] mx-auto mb-4 p-6 rounded-2xl bg-[#1c2540] border border-white/[0.06] flex justify-center items-center gap-8">
+        <div className="max-w-[560px] mx-auto mb-4 p-3 sm:p-6 rounded-2xl bg-[#1c2540] border border-white/[0.06] flex justify-center items-center gap-3 sm:gap-8">
           <div className="text-center">
-            <canvas ref={demoBeforeRef} width={192} height={108} className="rounded-lg" />
-            <div className="mt-2.5 font-mono text-[10px] tracking-widest uppercase text-[#7b8db0]">
+            <div className="max-w-[120px] sm:max-w-none">
+              <canvas ref={demoBeforeRef} width={192} height={108} className="rounded-lg w-full h-auto" />
+            </div>
+            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#7b8db0]">
               {t.demoOriginal}
             </div>
           </div>
-          <div className="text-2xl text-[#7b8db0]">→</div>
+          <div className="text-lg sm:text-2xl text-[#7b8db0]">→</div>
           <div className="text-center">
-            <canvas ref={demoAfterRef} width={162} height={108} className="rounded-lg" />
-            <div className="mt-2.5 font-mono text-[10px] tracking-widest uppercase text-[#7b8db0]">
+            <div className="max-w-[102px] sm:max-w-none">
+              <canvas ref={demoAfterRef} width={162} height={108} className="rounded-lg w-full h-auto" />
+            </div>
+            <div className="mt-2 font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#7b8db0]">
               {t.demoResult}
             </div>
           </div>
@@ -298,7 +331,7 @@ export default function FrameConverter() {
         {/* Dropzone */}
         <div
           className={[
-            'max-w-[560px] mx-auto mb-8 rounded-xl border border-dashed py-10 px-6 text-center cursor-pointer transition-all duration-200',
+            'max-w-[560px] mx-auto mb-8 rounded-xl border border-dashed py-7 sm:py-10 px-6 text-center cursor-pointer transition-all duration-200',
             isDragging
               ? 'border-white/40 bg-white/[0.04]'
               : 'border-white/[0.18] hover:border-white/30 hover:bg-white/[0.02]',
