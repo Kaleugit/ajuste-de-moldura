@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  style: ["italic"],
 });
 
 export const metadata: Metadata = {
-  title: "Ajuste de moldura · 15×10",
-  description: "Converta fotos 16:9 para o formato 15:10 com moldura branca ou preta, direto no navegador.",
+  title: "Moldura · ajuste para impressão 15×10",
+  description: "Adiciona moldura branca ou preta para impressão 15×10 sem cortar a foto. Tudo no navegador.",
 };
 
 export default function RootLayout({
@@ -30,10 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pt"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-zinc-50">{children}</body>
     </html>
   );
 }
